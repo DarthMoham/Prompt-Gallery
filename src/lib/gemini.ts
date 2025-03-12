@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const apiKey = import.meta.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI('apiKey');
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function enhancePrompt(prompt: string): Promise<string> {
   try {
