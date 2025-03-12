@@ -58,7 +58,7 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
       const enhanced = await enhancePrompt(content);
       setEnhancedContent(enhanced);
       setShowComparison(true);
-      toast.success('Prompt enhanced! Choose which version you prefer.');
+      toast.success('Prompt enhanced! Choose which version you prefer or edit either one.');
     } catch (error) {
       toast.error('Failed to enhance prompt');
     } finally {
@@ -161,9 +161,11 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
                       Keep Original
                     </button>
                   </h3>
-                  <div className="bg-white/5 rounded-lg p-4">
-                    <p className="text-white/80 whitespace-pre-wrap">{content}</p>
-                  </div>
+                  <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[150px] resize-y"
+                  />
                 </div>
                 <div>
                   <h3 className="text-white/80 mb-2 flex items-center gap-2">
@@ -177,9 +179,11 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
                       Use Enhanced
                     </button>
                   </h3>
-                  <div className="bg-cyan-500/5 rounded-lg p-4 border border-cyan-500/20">
-                    <p className="text-white/80 whitespace-pre-wrap">{enhancedContent}</p>
-                  </div>
+                  <textarea
+                    value={enhancedContent}
+                    onChange={(e) => setEnhancedContent(e.target.value)}
+                    className="w-full bg-cyan-500/5 border border-cyan-500/20 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[150px] resize-y"
+                  />
                 </div>
               </div>
             ) : (
