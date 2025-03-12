@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Wand2 } from 'lucide-react';
+import { X, Wand2, Check, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { CategoryCombobox } from './CategoryCombobox';
 import { enhancePrompt } from '../lib/gemini';
@@ -26,10 +26,12 @@ function toInitialCaps(str: string): string {
 export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptModalProps) {
   const [title, setTitle] = useState(prompt.title);
   const [content, setContent] = useState(prompt.content);
+  const [enhancedContent, setEnhancedContent] = useState('');
   const [category, setCategory] = useState(prompt.category);
   const [categories, setCategories] = useState<string[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -58,14 +60,28 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
 
     try {
       setIsEnhancing(true);
-      const enhancedContent = await enhancePrompt(content);
-      setContent(enhancedContent);
-      toast.success('Prompt enhanced successfully!');
+      const enhanced = await enhancePrompt(content);
+      setEnhancedContent(enhanced);
+      setShowComparison(true);
+      toast.success('Prompt enhanced! Choose which version you prefer.');
     } catch (error) {
       toast.error('Failed to enhance prompt');
     } finally {
       setIsEnhancing(false);
     }
+  };
+
+  const handleAcceptEnhanced = () => {
+    setContent(enhancedContent);
+    setEnhancedContent('');
+    setShowComparison(false);
+    toast.success('Enhanced version accepted!');
+  };
+
+  const handleKeepOriginal = () => {
+    setEnhancedContent('');
+    setShowComparison(false);
+    toast.success('Keeping original version');
   };
 
   if (!isOpen) return null;
@@ -132,7 +148,43 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
                 <p className="mt-1 text-sm text-red-400">{errors.title}</p>
               )}
             </div>
-            <div>
+            
+            {showComparison ? (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-white/80 mb-2 flex items-center gap-2">
+                    Original Prompt
+                    <button
+                      type="button"
+                      onClick={handleKeepOriginal}
+                      className="ml-auto text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors"
+                    >
+                      <ArrowLeft size={16} />
+                      Keep Original
+                    </button>
+                  </h3>
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <p className="text-white/80 whitespace-pre-wrap">{content}</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-white/80 mb-2 flex items-center gap-2">
+                    Enhanced Version
+                    <button
+                      type="button"
+                      onClick={handleAcceptEnhanced}
+                      className="ml-auto text-cyan-400 hover:text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/20 rounded-lg px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors"
+                    >
+                      <Check size={16} />
+                      Use Enhanced
+                    </button>
+                  </h3>
+                  <div className="bg-cyan-500/5 rounded-lg p-4 border border-cyan-500/20">
+                    <p className="text-white/80 whitespace-pre-wrap">{enhancedContent}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
               <div className="relative">
                 <textarea
                   placeholder="Prompt content *"
@@ -153,10 +205,12 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
                   <Wand2 size={20} className={isEnhancing ? 'animate-pulse' : ''} />
                 </button>
               </div>
-              {errors.content && (
-                <p className="mt-1 text-sm text-red-400">{errors.content}</p>
-              )}
-            </div>
+            )}
+            
+            {errors.content && (
+              <p className="mt-1 text-sm text-red-400">{errors.content}</p>
+            )}
+            
             <div>
               <CategoryCombobox
                 value={category}
