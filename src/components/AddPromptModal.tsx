@@ -102,11 +102,19 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
     e.preventDefault();
     
     if (validateForm()) {
-      onAdd({ title: title.trim(), content: content.trim(), category: toInitialCaps(category.trim()) });
+      // If we have an enhanced version and we're in comparison mode, use it by default
+      const finalContent = showComparison && enhancedContent ? enhancedContent : content;
+      onAdd({ 
+        title: title.trim(), 
+        content: finalContent.trim(), 
+        category: toInitialCaps(category.trim()) 
+      });
       setTitle('');
       setContent('');
+      setEnhancedContent('');
       setCategory('');
       setErrors({});
+      setShowComparison(false);
       onClose();
     }
   };

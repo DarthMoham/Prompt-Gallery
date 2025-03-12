@@ -107,8 +107,15 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
     e.preventDefault();
     
     if (validateForm()) {
-      onEdit({ title: title.trim(), content: content.trim(), category: toInitialCaps(category.trim()) });
+      // If we have an enhanced version and we're in comparison mode, use it by default
+      const finalContent = showComparison && enhancedContent ? enhancedContent : content;
+      onEdit({ 
+        title: title.trim(), 
+        content: finalContent.trim(), 
+        category: toInitialCaps(category.trim()) 
+      });
       setErrors({});
+      setShowComparison(false);
       onClose();
     }
   };
