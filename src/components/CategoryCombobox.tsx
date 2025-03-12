@@ -6,9 +6,10 @@ interface CategoryComboboxProps {
   onChange: (value: string) => void;
   categories: string[];
   placeholder?: string;
+  error?: string;
 }
 
-export function CategoryCombobox({ value, onChange, categories, placeholder = "Category" }: CategoryComboboxProps) {
+export function CategoryCombobox({ value, onChange, categories, placeholder = "Category", error }: CategoryComboboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -57,7 +58,7 @@ export function CategoryCombobox({ value, onChange, categories, placeholder = "C
           onChange={handleInputChange}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-10 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500"
+          className={`w-full bg-white/5 border ${error ? 'border-red-500' : 'border-white/10'} rounded-lg pl-10 pr-10 py-2.5 text-white placeholder-white/40 focus:outline-none ${error ? 'focus:border-red-500' : 'focus:border-cyan-500'}`}
         />
         <button
           type="button"

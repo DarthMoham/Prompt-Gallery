@@ -1,0 +1,15 @@
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  svg {
+    color: #60a5fa;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  svg {
+    color: #2563eb;
+  }
+}

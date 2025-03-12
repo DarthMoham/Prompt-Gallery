@@ -14,11 +14,19 @@ interface EditPromptModalProps {
   };
 }
 
+function toInitialCaps(str: string): string {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptModalProps) {
   const [title, setTitle] = useState(prompt.title);
   const [content, setContent] = useState(prompt.content);
   const [category, setCategory] = useState(prompt.category);
   const [categories, setCategories] = useState<string[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     fetchCategories();
@@ -32,7 +40,7 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
 
       if (error) throw error;
 
-      const uniqueCategories = [...new Set(data.map(item => item.category))].sort();
+      const uniqueCategories = [...new Set(data.map(item => toInitialCaps(item.category)))].sort();
       setCategories(uniqueCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -41,10 +49,31 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
 
   if (!isOpen) return null;
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!title.trim()) {
+      newErrors.title = 'Title is required';
+    }
+    if (!content.trim()) {
+      newErrors.content = 'Content is required';
+    }
+    if (!category.trim()) {
+      newErrors.category = 'Category is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onEdit({ title, content, category });
-    onClose();
+    
+    if (validateForm()) {
+      onEdit({ title: title.trim(), content: content.trim(), category: toInitialCaps(category.trim()) });
+      setErrors({});
+      onClose();
+    }
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -70,27 +99,47 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
             <div>
               <input
                 type="text"
-                placeholder="Title"
+                placeholder="Title *"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500"
-                required
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setErrors({ ...errors, title: '' });
+                }}
+                className={`w-full bg-white/5 border ${errors.title ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500`}
               />
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-400">{errors.title}</p>
+              )}
             </div>
             <div>
               <textarea
-                placeholder="Prompt content"
+                placeholder="Prompt content *"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[200px] resize-y"
-                required
+                onChange={(e) => {
+                  setContent(e.target.value);
+                  setErrors({ ...errors, content: '' });
+                }}
+                className={`w-full bg-white/5 border ${errors.content ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[200px] resize-y`}
               />
+              {errors.content && (
+                <p className="mt-1 text-sm text-red-400">{errors.content}</p>
+              )}
             </div>
-            <CategoryCombobox
-              value={category}
-              onChange={setCategory}
-              categories={categories}
-            />
+            <div>
+              <CategoryCombobox
+                value={category}
+                onChange={(value) => {
+                  setCategory(value);
+                  setErrors({ ...errors, category: '' });
+                }}
+                categories={categories}
+                placeholder="Category *"
+                error={errors.category}
+              />
+              {errors.category && (
+                <p className="mt-1 text-sm text-red-400">{errors.category}</p>
+              )}
+            </div>
             <button
               type="submit"
               className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors"
