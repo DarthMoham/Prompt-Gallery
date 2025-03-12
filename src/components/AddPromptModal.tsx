@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Wand2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { CategoryCombobox } from './CategoryCombobox';
+import { enhancePrompt } from '../lib/gemini';
+import { toast } from 'react-hot-toast';
 
 interface AddPromptModalProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
   const [category, setCategory] = useState('');
   const [categories, setCategories] = useState<string[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isEnhancing, setIsEnhancing] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -41,6 +44,24 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
       console.error('Error fetching categories:', error);
     }
   }
+
+  const handleEnhancePrompt = async () => {
+    if (!content.trim()) {
+      setErrors({ ...errors, content: 'Please enter content before enhancing' });
+      return;
+    }
+
+    try {
+      setIsEnhancing(true);
+      const enhancedContent = await enhancePrompt(content);
+      setContent(enhancedContent);
+      toast.success('Prompt enhanced successfully!');
+    } catch (error) {
+      toast.error('Failed to enhance prompt');
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -110,15 +131,26 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
               )}
             </div>
             <div>
-              <textarea
-                placeholder="Prompt content *"
-                value={content}
-                onChange={(e) => {
-                  setContent(e.target.value);
-                  setErrors({ ...errors, content: '' });
-                }}
-                className={`w-full bg-white/5 border ${errors.content ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[200px] resize-y`}
-              />
+              <div className="relative">
+                <textarea
+                  placeholder="Prompt content *"
+                  value={content}
+                  onChange={(e) => {
+                    setContent(e.target.value);
+                    setErrors({ ...errors, content: '' });
+                  }}
+                  className={`w-full bg-white/5 border ${errors.content ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[200px] resize-y pr-12`}
+                />
+                <button
+                  type="button"
+                  onClick={handleEnhancePrompt}
+                  disabled={isEnhancing}
+                  className="absolute top-2 right-2 p-2 text-white/60 hover:text-cyan-400 transition-colors disabled:opacity-50"
+                  title="Enhance prompt"
+                >
+                  <Wand2 size={20} className={isEnhancing ? 'animate-pulse' : ''} />
+                </button>
+              </div>
               {errors.content && (
                 <p className="mt-1 text-sm text-red-400">{errors.content}</p>
               )}
