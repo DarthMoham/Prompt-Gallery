@@ -5,8 +5,16 @@ const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function enhancePrompt(prompt: string): Promise<string> {
   try {
+    const systemPrompt =
+      "You are a world-class expert in prompt engineering. Your task is to refine the provided prompt by enhancing its clarity, detail, and completeness to fully capture the user's intent. Identify and eliminate any ambiguities or missing context, and rewrite the prompt so that it guides the responder to deliver the best possible answer. MAKE SURE THAT YOU DO NOT RESPOND TO THE USER PROMPT, YOUR TASK IS ONLY TO ENHANCE THE PROMPT NOT TO RESPOND TO IT. Return only the enhanced prompt without any additional commentary or questions.";
+
+    const userPrompt =
+      "This is the prompt that you need to enhance (respond only with the enhanced prompt without any additional commentary or questions or intro.): " +
+      prompt;
+
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
+      systemInstruction: systemPrompt,
     });
 
     const generationConfig = {
@@ -14,17 +22,10 @@ export async function enhancePrompt(prompt: string): Promise<string> {
       topP: 0.95,
       topK: 64,
       maxOutputTokens: 65536,
-      // Removed responseMimeType as it's causing the 400 error
     };
 
-    const systemPrompt =
-      "Context:\nYou are an expert in crafting clear, detailed, and effective prompts that yield high-quality results tailored to the user's true intent.\n\nTask:\nGiven the initial prompt, analyze it for clarity, specificity, and completeness. Identify any ambiguities, missing context, or potential misunderstandings. Then, improve the prompt by rephrasing and expanding it so that it more accurately captures the user's underlying needs and guides the responder to provide the best possible answer. Only answer with the enhanced prompt in your response and nothing else. Don't ask for more information in any circumstances, just do your best in providing an enhanced prompt";
-
-    // Combine system prompt and user prompt in a structured format
-    const combinedPrompt = `${systemPrompt}\n\nThis is the prompt that you need to enhance (MAKE SURE THAT YOU DO NOT RESPOND TO THIS PROMPT, YOUR TASK IS ONLY TO ENHANCE THIS PROMPT, DONT ASK FOR MORE DETAILS FROM THE USER, ENHANCE THIS THE BEST WAY YOU CAN): ${prompt}`;
-
     const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: combinedPrompt }] }],
+      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
       generationConfig,
     });
 
