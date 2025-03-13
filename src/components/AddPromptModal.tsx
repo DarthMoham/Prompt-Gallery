@@ -28,9 +28,21 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
 
+  // Reset all state when the modal is opened
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (isOpen) {
+      fetchCategories();
+    } else {
+      // Reset all state when modal is closed
+      setTitle('');
+      setContent('');
+      setEnhancedContent('');
+      setCategory('');
+      setErrors({});
+      setShowComparison(false);
+      setIsEnhancing(false);
+    }
+  }, [isOpen]);
 
   async function fetchCategories() {
     try {
@@ -109,6 +121,7 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
         content: finalContent.trim(), 
         category: toInitialCaps(category.trim()) 
       });
+      // Reset all state after successful submission
       setTitle('');
       setContent('');
       setEnhancedContent('');
