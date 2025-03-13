@@ -192,7 +192,7 @@ function App() {
           </div>
           <div className="relative">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40" size={20} />
-            <div className="relative inline-block w-full sm:w-[180px]">
+            <div className="relative inline-block w-full sm:w-[240px]">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
