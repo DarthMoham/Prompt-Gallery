@@ -65,7 +65,9 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
       const enhanced = await enhancePrompt(content);
       setEnhancedContent(enhanced);
       setShowComparison(true);
-      toast.success('Prompt enhanced! Choose which version you prefer or edit either one.');
+      toast.success('Prompt enhanced! Choose which version you prefer or edit either one.', {
+        duration: 5000,
+      });
     } catch (error) {
       toast.error('Failed to enhance prompt');
     } finally {
