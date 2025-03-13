@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { X, Copy, Check, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -17,6 +17,8 @@ interface ViewPromptModalProps {
 
 export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: ViewPromptModalProps) {
   const [isCopied, setIsCopied] = React.useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [mouseDownOutside, setMouseDownOutside] = useState(false);
 
   if (!isOpen) return null;
 
@@ -31,18 +33,28 @@ export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: V
     }
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
+      setMouseDownOutside(true);
+    } else {
+      setMouseDownOutside(false);
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && mouseDownOutside) {
       onClose();
     }
+    setMouseDownOutside(false);
   };
 
   return (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={handleOverlayClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     >
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl w-full max-w-2xl border border-white/20 flex flex-col max-h-[90vh]">
+      <div ref={modalRef} className="bg-white/10 backdrop-blur-lg rounded-xl w-full max-w-2xl border border-white/20 flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-start p-6">
           <div>
             <h2 className="text-2xl font-semibold text-white mb-2">{prompt.title}</h2>

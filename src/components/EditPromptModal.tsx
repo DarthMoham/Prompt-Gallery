@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Wand2, Check, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { CategoryCombobox } from './CategoryCombobox';
@@ -32,6 +32,8 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [mouseDownOutside, setMouseDownOutside] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -120,18 +122,28 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
     }
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
+      setMouseDownOutside(true);
+    } else {
+      setMouseDownOutside(false);
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && mouseDownOutside) {
       onClose();
     }
+    setMouseDownOutside(false);
   };
 
   return (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={handleOverlayClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     >
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl w-full max-w-lg border border-white/20 flex flex-col max-h-[90vh]">
+      <div ref={modalRef} className="bg-white/10 backdrop-blur-lg rounded-xl w-full max-w-lg border border-white/20 flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-center p-6">
           <h2 className="text-2xl font-semibold text-white">Edit Prompt</h2>
           <button onClick={onClose} className="text-white/60 hover:text-white">
