@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Wand2, Check, ArrowLeft } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 import { CategoryCombobox } from './CategoryCombobox';
-import { enhancePrompt } from '../lib/gemini';
+import { enhancePrompt, fetchCategories } from '../lib/api';
 import { toast } from 'react-hot-toast';
 
 interface EditPromptModalProps {

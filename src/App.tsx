@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Search, Sparkles, Filter } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
-import { supabase } from './lib/supabase';
 import { PromptCard } from './components/PromptCard';
 import { AddPromptModal } from './components/AddPromptModal';
-
-interface Prompt {
-  id: string;
-  title: string;
-  content: string;
-  category: string;
-  created_at: string;
-}
+import * as api from './lib/api';
+import { Prompt } from './lib/api';
 
 function toInitialCaps(str: string): string {
   return str
@@ -37,22 +30,8 @@ function App() {
       setIsLoading(true);
       setError(null);
       
-      const { data, error } = await supabase
-        .from('prompts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      // Transform categories to initial caps
-      const transformedData = data?.map(prompt => ({
-        ...prompt,
-        category: toInitialCaps(prompt.category)
-      })) || [];
-
-      setPrompts(transformedData);
+      const data = await api.fetchPrompts();
+      setPrompts(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch prompts';
       setError(errorMessage);
@@ -64,17 +43,7 @@ function App() {
 
   async function addPrompt(promptData: { title: string; content: string; category: string }) {
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .insert([{
-          ...promptData,
-          category: toInitialCaps(promptData.category)
-        }]);
-
-      if (error) {
-        throw error;
-      }
-
+      await api.addPrompt(promptData);
       toast.success('Prompt added successfully');
       await fetchPrompts();
     } catch (err) {
@@ -85,18 +54,7 @@ function App() {
 
   async function editPrompt(id: string, promptData: { title: string; content: string; category: string }) {
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .update({
-          ...promptData,
-          category: toInitialCaps(promptData.category)
-        })
-        .eq('id', id);
-
-      if (error) {
-        throw error;
-      }
-
+      await api.updatePrompt(id, promptData);
       toast.success('Prompt updated successfully');
       await fetchPrompts();
     } catch (err) {
@@ -107,15 +65,7 @@ function App() {
 
   async function deletePrompt(id: string) {
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        throw error;
-      }
-
+      await api.deletePrompt(id);
       toast.success('Prompt deleted successfully');
       await fetchPrompts();
     } catch (err) {

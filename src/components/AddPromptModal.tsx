@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Wand2, Check, ArrowLeft } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 import { CategoryCombobox } from './CategoryCombobox';
-import { enhancePrompt } from '../lib/gemini';
+import { enhancePrompt, fetchCategories } from '../lib/api';
 import { toast } from 'react-hot-toast';
 
 interface AddPromptModalProps {
@@ -33,7 +32,7 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
   // Reset all state when the modal is opened
   useEffect(() => {
     if (isOpen) {
-      fetchCategories();
+      loadCategories();
     } else {
       // Reset all state when modal is closed
       setTitle('');
@@ -46,16 +45,10 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
     }
   }, [isOpen]);
 
-  async function fetchCategories() {
+  async function loadCategories() {
     try {
-      const { data, error } = await supabase
-        .from('prompts')
-        .select('category');
-
-      if (error) throw error;
-
-      const uniqueCategories = [...new Set(data.map(item => toInitialCaps(item.category)))].sort();
-      setCategories(uniqueCategories);
+      const data = await fetchCategories();
+      setCategories(data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
