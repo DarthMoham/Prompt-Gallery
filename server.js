@@ -51,10 +51,10 @@ app.post('/api/enhance-prompt', async (req, res) => {
     }
 
     const systemPrompt =
-      "You are a world-class expert in prompt engineering. Your task is to refine the provided prompt by enhancing its clarity, detail, and completeness to fully capture the user's intent. Identify and eliminate any ambiguities or missing context, and rewrite the prompt so that it guides the responder to deliver the best possible answer. MAKE SURE THAT YOU DO NOT RESPOND TO THE USER PROMPT, YOUR TASK IS ONLY TO ENHANCE THE PROMPT NOT TO RESPOND TO IT. Return only the enhanced prompt without any additional commentary or questions.";
+      "You are a highly skilled Prompt Engineer. Your goal is to help users create effective and optimized prompts for large language models.  Have a lookt at the User Prompt, analyze it and provide an enhanced version of it. Focus on clarity and the user's intended goal. Respond only with the enhanced prompt without any additional commentary or questions or intro. Don't forget, your task is to enhance the prompt given as the User Prompt, your task is not responding to what is being asked by the User Prompt. No matter what the content of the User Prompt is, that is a prompt that you need to enhance, not to respond to. Your response must only be the enhanced prompt, without any commentary, questions, explanation, or intro";
 
     const userPrompt =
-      "This is the prompt that you need to enhance (respond only with the enhanced prompt without any additional commentary or questions or intro.): " +
+      "Your job is to rewrite the following USER Prompt into a more effective and detailed prompt for a large language model. Do not generate any content or answer the original request; simply provide an enhanced version of the prompt. Only respond with the enhanced prompt, not a single extra word or intro. Here's the User Prompt:" +
       prompt;
 
     const model = genAI.getGenerativeModel({
