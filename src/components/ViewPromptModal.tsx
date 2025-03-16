@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Copy, Check, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
 interface ViewPromptModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface ViewPromptModalProps {
 
 export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: ViewPromptModalProps) {
   const [isCopied, setIsCopied] = React.useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const [mouseDownOutside, setMouseDownOutside] = useState(false);
 
@@ -31,6 +33,10 @@ export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: V
     } catch (err) {
       toast.error('Failed to copy to clipboard');
     }
+  };
+
+  const handleDeleteClick = () => {
+    onDelete();
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -49,6 +55,7 @@ export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: V
   };
 
   return (
+    <>
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onMouseDown={handleMouseDown}
@@ -78,7 +85,7 @@ export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: V
               <Pencil size={20} />
             </button>
             <button 
-              onClick={onDelete}
+              onClick={handleDeleteClick}
               className="text-white/60 hover:text-red-400 transition-colors"
               title="Delete prompt"
             >
@@ -105,5 +112,13 @@ export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: V
         </div>
       </div>
     </div>
+
+    <DeleteConfirmationModal
+      isOpen={isDeleteModalOpen}
+      onClose={() => setIsDeleteModalOpen(false)}
+      onConfirm={handleDeleteClick}
+      promptTitle={prompt.title}
+    />
+  </>
   );
 }

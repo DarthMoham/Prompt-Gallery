@@ -126,7 +126,9 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
           setIsViewModalOpen(false);
           setIsEditModalOpen(true);
         }}
-        onDelete={() => handleDeleteClick({} as React.MouseEvent)}
+        onDelete={() => {
+          setIsDeleteModalOpen(true);
+        }}
         prompt={prompt}
       />
 
