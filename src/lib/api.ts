@@ -1,3 +1,7 @@
+const getApiBaseUrl = () => {
+  return '';
+};
+
 export interface Prompt {
     id: string;
     title: string;
@@ -5,12 +9,14 @@ export interface Prompt {
     category: string;
     created_at: string;
   }
-  
+
   // Fetch all prompts
   export async function fetchPrompts(): Promise<Prompt[]> {
     try {
-      const response = await fetch('/api/prompts');
+      const response = await fetch(`${getApiBaseUrl()}/api/prompts`);
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
         throw new Error('Failed to fetch prompts');
       }
       return await response.json();
@@ -19,12 +25,14 @@ export interface Prompt {
       throw error;
     }
   }
-  
+
   // Fetch categories
   export async function fetchCategories(): Promise<string[]> {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch(`${getApiBaseUrl()}/api/categories`);
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
         throw new Error('Failed to fetch categories');
       }
       return await response.json();
@@ -33,11 +41,11 @@ export interface Prompt {
       throw error;
     }
   }
-  
+
   // Add a new prompt
   export async function addPrompt(promptData: { title: string; content: string; category: string }): Promise<void> {
     try {
-      const response = await fetch('/api/prompts', {
+      const response = await fetch(`${getApiBaseUrl()}/api/prompts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,6 +54,8 @@ export interface Prompt {
       });
       
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
         throw new Error('Failed to add prompt');
       }
     } catch (error) {
@@ -57,7 +67,7 @@ export interface Prompt {
   // Update an existing prompt
   export async function updatePrompt(id: string, promptData: { title: string; content: string; category: string }): Promise<void> {
     try {
-      const response = await fetch(`/api/prompts/${id}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/prompts/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -66,6 +76,8 @@ export interface Prompt {
       });
       
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
         throw new Error('Failed to update prompt');
       }
     } catch (error) {
@@ -73,15 +85,17 @@ export interface Prompt {
       throw error;
     }
   }
-  
+
   // Delete a prompt
   export async function deletePrompt(id: string): Promise<void> {
     try {
-      const response = await fetch(`/api/prompts/${id}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/prompts/${id}`, {
         method: 'DELETE',
       });
       
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
         throw new Error('Failed to delete prompt');
       }
     } catch (error) {
@@ -89,11 +103,11 @@ export interface Prompt {
       throw error;
     }
   }
-  
-  // Enhance a prompt (already implemented in previous step)
+
+  // Enhance a prompt
   export async function enhancePrompt(prompt: string): Promise<string> {
     try {
-      const response = await fetch('/api/enhance-prompt', {
+      const response = await fetch(`${getApiBaseUrl()}/api/enhance-prompt`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,6 +116,8 @@ export interface Prompt {
       });
   
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
         throw new Error('Failed to enhance prompt');
       }
   

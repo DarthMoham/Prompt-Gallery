@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,13 +22,19 @@ app.use(cors());
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Supabase URL or key is missing from environment variables');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Helper function for initial caps
 function toInitialCaps(str) {
+  if (!str) return ''; // Handle null or undefined values
   return str
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -84,7 +90,10 @@ app.get('/api/prompts', async (req, res) => {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     // Transform categories to initial caps
     const transformedData = data?.map(prompt => ({
@@ -106,7 +115,10 @@ app.get('/api/categories', async (req, res) => {
       .from('prompts')
       .select('category');
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     const uniqueCategories = [...new Set(data.map(item => toInitialCaps(item.category)))].sort();
     res.json(uniqueCategories);
@@ -132,7 +144,10 @@ app.post('/api/prompts', async (req, res) => {
         category: toInitialCaps(promptData.category)
       }]);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     res.status(201).json({ message: 'Prompt added successfully' });
   } catch (error) {
@@ -159,7 +174,10 @@ app.put('/api/prompts/:id', async (req, res) => {
       })
       .eq('id', id);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     res.json({ message: 'Prompt updated successfully' });
   } catch (error) {
@@ -178,7 +196,10 @@ app.delete('/api/prompts/:id', async (req, res) => {
       .delete()
       .eq('id', id);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     res.json({ message: 'Prompt deleted successfully' });
   } catch (error) {
@@ -187,6 +208,20 @@ app.delete('/api/prompts/:id', async (req, res) => {
   }
 });
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve the static files from the dist directory
+  app.use(express.static(join(__dirname, 'dist')));
+  
+  // Handle all other routes by returning the index.html
+  app.get('*', (req, res) => {
+    // Exclude API routes from the catch-all handler
+    if (!req.path.startsWith('/api/')) {
+      res.sendFile(join(__dirname, 'dist', 'index.html'));
+    }
+  });
+}
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
 });
