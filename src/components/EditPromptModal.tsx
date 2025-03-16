@@ -35,19 +35,15 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
   const [mouseDownOutside, setMouseDownOutside] = useState(false);
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (isOpen) {
+      loadCategories();
+    }
+  }, [isOpen]);
 
-  async function fetchCategories() {
+  async function loadCategories() {
     try {
-      const { data, error } = await supabase
-        .from('prompts')
-        .select('category');
-
-      if (error) throw error;
-
-      const uniqueCategories = [...new Set(data.map(item => toInitialCaps(item.category)))].sort();
-      setCategories(uniqueCategories);
+      const data = await fetchCategories();
+      setCategories(data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
