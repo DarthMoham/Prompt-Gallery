@@ -3,6 +3,7 @@ import { Copy, Check, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { EditPromptModal } from './EditPromptModal';
 import { ViewPromptModal } from './ViewPromptModal';
+import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
 interface PromptCardProps {
   prompt: {
@@ -21,6 +22,7 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
   const [isCopied, setIsCopied] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -45,7 +47,15 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
     onDelete(prompt.id);
+    setIsDeleteModalOpen(false);
+    if (isViewModalOpen) {
+      setIsViewModalOpen(false);
+    }
   };
 
   const handleCategoryClick = (e: React.MouseEvent) => {
@@ -116,11 +126,15 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
           setIsViewModalOpen(false);
           setIsEditModalOpen(true);
         }}
-        onDelete={() => {
-          setIsViewModalOpen(false);
-          onDelete(prompt.id);
-        }}
+        onDelete={() => handleDeleteClick({} as React.MouseEvent)}
         prompt={prompt}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        promptTitle={prompt.title}
       />
     </>
   );
