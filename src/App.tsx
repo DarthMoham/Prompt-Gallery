@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Sparkles, Filter } from 'lucide-react';
+import { Plus, Search, Sparkles, Filter, Wand2 } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { PromptCard } from './components/PromptCard';
 import { AddPromptModal } from './components/AddPromptModal';
@@ -20,6 +20,9 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [promptToEnhance, setPromptToEnhance] = useState('');
+  const [enhancedPrompt, setEnhancedPrompt] = useState('');
+  const [isEnhancing, setIsEnhancing] = useState(false);
 
   useEffect(() => {
     fetchPrompts();
@@ -38,6 +41,24 @@ function App() {
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleEnhancePrompt() {
+    if (!promptToEnhance.trim()) {
+      toast.error('Please enter a prompt to enhance');
+      return;
+    }
+
+    try {
+      setIsEnhancing(true);
+      const enhanced = await api.enhancePrompt(promptToEnhance);
+      setEnhancedPrompt(enhanced);
+      toast.success('Prompt enhanced successfully!');
+    } catch (err) {
+      toast.error('Failed to enhance prompt');
+    } finally {
+      setIsEnhancing(false);
     }
   }
 
@@ -74,7 +95,6 @@ function App() {
     }
   }
 
-  // Get unique categories and transform them to initial caps
   const categories = ['all', ...new Set(prompts.map(prompt => prompt.category))].sort();
 
   const filteredPrompts = prompts.filter(prompt => {
@@ -92,6 +112,22 @@ function App() {
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
+  };
+
+  const handleCopyEnhanced = async () => {
+    try {
+      await navigator.clipboard.writeText(enhancedPrompt);
+      toast.success('Enhanced prompt copied to clipboard!');
+    } catch (err) {
+      toast.error('Failed to copy to clipboard');
+    }
+  };
+
+  const handleSaveEnhanced = () => {
+    setIsModalOpen(true);
+    // Pre-fill the add prompt modal with the enhanced prompt
+    setPromptToEnhance('');
+    setEnhancedPrompt('');
   };
 
   if (error) {
@@ -127,6 +163,73 @@ function App() {
             <span className="hidden sm:inline">Add Prompt</span>
             <span className="sm:hidden">Add</span>
           </button>
+        </div>
+
+        {/* Enhanced Prompt Enhancement Section */}
+        <div className="mb-12 bg-white/[0.07] backdrop-blur-lg rounded-xl p-6 border border-white/[0.07]">
+          <div className="flex items-center gap-3 mb-6">
+            <Wand2 className="text-cyan-400" size={24} />
+            <h2 className="text-xl font-semibold text-white">Enhance Your Prompt</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-white/80 text-sm font-medium">Original Prompt</label>
+              </div>
+              <textarea
+                value={promptToEnhance}
+                onChange={(e) => setPromptToEnhance(e.target.value)}
+                placeholder="Enter your prompt here..."
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
+              />
+              <button
+                onClick={handleEnhancePrompt}
+                disabled={isEnhancing || !promptToEnhance.trim()}
+                className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <Wand2 size={18} className={isEnhancing ? 'animate-pulse' : ''} />
+                {isEnhancing ? 'Enhancing...' : 'Enhance Prompt'}
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-white/80 text-sm font-medium">Enhanced Version</label>
+              </div>
+              <div className={`relative ${!enhancedPrompt ? 'min-h-[180px]' : ''}`}>
+                {enhancedPrompt ? (
+                  <textarea
+                    value={enhancedPrompt}
+                    readOnly
+                    className="w-full bg-cyan-500/5 border border-cyan-500/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">
+                    <div className="text-center px-6">
+                      <Wand2 size={32} className="text-white/20 mx-auto mb-3" />
+                      <p className="text-white/40 text-sm">Your enhanced prompt will appear here</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCopyEnhanced}
+                  disabled={!enhancedPrompt}
+                  className="flex-1 bg-white/5 hover:bg-white/10 disabled:bg-white/5 disabled:text-white/20 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                >
+                  Copy
+                </button>
+                <button
+                  onClick={handleSaveEnhanced}
+                  disabled={!enhancedPrompt}
+                  className="flex-1 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/20 disabled:text-white/20 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                >
+                  Save to Gallery
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
