@@ -8,6 +8,7 @@ interface AddPromptModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (prompt: { title: string; content: string; category: string }) => void;
+  prefilledContent?: string;
 }
 
 function toInitialCaps(str: string): string {
@@ -17,7 +18,7 @@ function toInitialCaps(str: string): string {
     .join(' ');
 }
 
-export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) {
+export function AddPromptModal({ isOpen, onClose, onAdd, prefilledContent = '' }: AddPromptModalProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [enhancedContent, setEnhancedContent] = useState('');
@@ -33,17 +34,15 @@ export function AddPromptModal({ isOpen, onClose, onAdd }: AddPromptModalProps) 
   useEffect(() => {
     if (isOpen) {
       loadCategories();
-    } else {
-      // Reset all state when modal is closed
       setTitle('');
-      setContent('');
+      setContent(prefilledContent);
       setEnhancedContent('');
       setCategory('');
       setErrors({});
       setShowComparison(false);
       setIsEnhancing(false);
     }
-  }, [isOpen]);
+  }, [isOpen, prefilledContent]);
 
   async function loadCategories() {
     try {

@@ -23,6 +23,7 @@ function App() {
   const [promptToEnhance, setPromptToEnhance] = useState('');
   const [enhancedPrompt, setEnhancedPrompt] = useState('');
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [prefilledContent, setPrefilledContent] = useState('');
 
   useEffect(() => {
     fetchPrompts();
@@ -67,6 +68,9 @@ function App() {
       await api.addPrompt(promptData);
       toast.success('Prompt added successfully');
       await fetchPrompts();
+      setPromptToEnhance('');
+      setEnhancedPrompt('');
+      setPrefilledContent('');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to add prompt';
       toast.error(errorMessage);
@@ -124,10 +128,8 @@ function App() {
   };
 
   const handleSaveEnhanced = () => {
+    setPrefilledContent(enhancedPrompt);
     setIsModalOpen(true);
-    // Pre-fill the add prompt modal with the enhanced prompt
-    setPromptToEnhance('');
-    setEnhancedPrompt('');
   };
 
   if (error) {
@@ -156,7 +158,10 @@ function App() {
             <h1 className="text-2xl sm:text-3xl font-bold text-white">Prompt Gallery</h1>
           </div>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setPrefilledContent('');
+              setIsModalOpen(true);
+            }}
             className="flex items-center gap-1 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base"
           >
             <Plus size={16} className="sm:size-5" />
@@ -296,8 +301,12 @@ function App() {
 
         <AddPromptModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setPrefilledContent('');
+          }}
           onAdd={addPrompt}
+          prefilledContent={prefilledContent}
         />
       </div>
       <Toaster position="bottom-right" />
