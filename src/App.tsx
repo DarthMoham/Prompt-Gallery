@@ -68,6 +68,7 @@ function App() {
       await api.addPrompt(promptData);
       toast.success('Prompt added successfully');
       await fetchPrompts();
+      // Reset the enhanced prompt and prefilled content after successful save
       setPromptToEnhance('');
       setEnhancedPrompt('');
       setPrefilledContent('');
@@ -154,7 +155,7 @@ function App() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
-            <Sparkles className="text-blue-400 sm:size-8 size-6" />
+            <Sparkles className="text-cyan-400 sm:size-8 size-6" />
             <h1 className="text-2xl sm:text-3xl font-bold text-white">Prompt Gallery</h1>
           </div>
           <button
@@ -162,7 +163,7 @@ function App() {
               setPrefilledContent('');
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base"
+            className="flex items-center gap-1 sm:gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base"
           >
             <Plus size={16} className="sm:size-5" />
             <span className="hidden sm:inline">Add Prompt</span>
