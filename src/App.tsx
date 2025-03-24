@@ -206,7 +206,7 @@ function App() {
                 {enhancedPrompt ? (
                   <textarea
                     value={enhancedPrompt}
-                    readOnly
+                    onChange={(e) => setEnhancedPrompt(e.target.value)}
                     className="w-full bg-cyan-500/5 border border-cyan-500/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
                   />
                 ) : (
