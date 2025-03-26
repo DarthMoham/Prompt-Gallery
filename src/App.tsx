@@ -186,7 +186,7 @@ function App() {
             <h2 className="text-xl font-semibold text-white">Enhance Your Prompt</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-3">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="text-white/80 text-sm font-medium">Original Prompt</label>
               </div>
@@ -218,7 +218,7 @@ function App() {
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="text-white/80 text-sm font-medium">Enhanced Version</label>
               </div>
