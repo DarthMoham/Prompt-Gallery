@@ -3,19 +3,13 @@ import { X, Wand2, Check, ArrowLeft } from 'lucide-react';
 import { CategoryCombobox } from './CategoryCombobox';
 import { enhancePrompt, fetchCategories } from '../lib/api';
 import { toast } from 'react-hot-toast';
+import { toInitialCaps } from '../lib/utils';
 
 interface AddPromptModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (prompt: { title: string; content: string; category: string }) => void;
   prefilledContent?: string;
-}
-
-function toInitialCaps(str: string): string {
-  return str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
 }
 
 export function AddPromptModal({ isOpen, onClose, onAdd, prefilledContent = '' }: AddPromptModalProps) {

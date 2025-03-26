@@ -6,13 +6,6 @@ import { AddPromptModal } from './components/AddPromptModal';
 import * as api from './lib/api';
 import { Prompt } from './lib/api';
 
-function toInitialCaps(str: string): string {
-  return str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-}
-
 function App() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

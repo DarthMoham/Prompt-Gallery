@@ -3,6 +3,7 @@ import { X, Wand2, Check, ArrowLeft } from 'lucide-react';
 import { CategoryCombobox } from './CategoryCombobox';
 import { enhancePrompt, fetchCategories } from '../lib/api';
 import { toast } from 'react-hot-toast';
+import { toInitialCaps } from '../lib/utils';
 
 interface EditPromptModalProps {
   isOpen: boolean;
@@ -13,13 +14,6 @@ interface EditPromptModalProps {
     content: string;
     category: string;
   };
-}
-
-function toInitialCaps(str: string): string {
-  return str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
 }
 
 export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptModalProps) {
