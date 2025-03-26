@@ -211,7 +211,7 @@ function App() {
               <button
                 onClick={handleEnhancePrompt}
                 disabled={isEnhancing || !promptToEnhance.trim()}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className={`w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-600/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 ${isEnhancing ? 'enhancing-button' : ''}`}
               >
                 <Wand2 size={18} className={isEnhancing ? 'animate-pulse' : ''} />
                 {isEnhancing ? 'Enhancing...' : 'Enhance Prompt'}
