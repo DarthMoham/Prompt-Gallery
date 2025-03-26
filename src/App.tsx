@@ -222,27 +222,26 @@ function App() {
               <div className="flex items-center justify-between">
                 <label className="text-white/80 text-sm font-medium">Enhanced Version</label>
               </div>
-              <div className={`relative ${!enhancedPrompt ? 'min-h-[180px]' : ''}`}>
-                {enhancedPrompt ? (
-                  <div className="relative">
-                    {enhancedPrompt && (
-                      <button
-                        onClick={handleClearEnhanced}
-                        className="absolute -top-[32px] right-2 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 hover:text-cyan-200 px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors trapezoid-button"
-                        style={{ borderBottom: 0 }}
-                      >
-                        <X size={14} />
-                        Clear
-                      </button>
-                    )}
-                    <textarea
-                      value={enhancedPrompt}
-                      onChange={(e) => setEnhancedPrompt(e.target.value)}
-                      className="w-full bg-cyan-500/5 border border-cyan-500/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
-                    />
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">
+              <div className="relative">
+                {enhancedPrompt && (
+                  <button
+                    onClick={handleClearEnhanced}
+                    className="absolute -top-[32px] right-2 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 hover:text-cyan-200 px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors trapezoid-button"
+                    style={{ borderBottom: 0 }}
+                  >
+                    <X size={14} />
+                    Clear
+                  </button>
+                )}
+                <textarea
+                  value={enhancedPrompt}
+                  onChange={(e) => setEnhancedPrompt(e.target.value)}
+                  className="w-full bg-cyan-500/5 border border-cyan-500/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
+                  placeholder=""
+                  disabled={!enhancedPrompt}
+                />
+                {!enhancedPrompt && (
+                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <div className="text-center px-6">
                       <Wand2 size={32} className="text-white/20 mx-auto mb-3" />
                       <p className="text-white/40 text-sm">Your enhanced prompt will appear here</p>
