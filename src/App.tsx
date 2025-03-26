@@ -194,7 +194,7 @@ function App() {
                 {promptToEnhance && (
                   <button
                     onClick={handleClearOriginal}
-                    className="absolute -top-[33px] right-0 bg-white/10 hover:bg-white/20 text-white/60 hover:text-white border border-white/10 rounded-tl-lg rounded-tr-lg rounded-br-lg px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors"
+                    className="absolute -top-[33px] right-2 bg-white/10 hover:bg-white/20 text-white/60 hover:text-white border border-white/10 px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors trapezoid-button"
                     style={{ borderBottom: 0 }}
                   >
                     <X size={14} />
@@ -228,7 +228,7 @@ function App() {
                     {enhancedPrompt && (
                       <button
                         onClick={handleClearEnhanced}
-                        className="absolute -top-[33px] right-0 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 hover:text-cyan-200 border border-cyan-500/20 rounded-tl-lg rounded-tr-lg rounded-br-lg px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors"
+                        className="absolute -top-[33px] right-2 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 hover:text-cyan-200 border border-cyan-500/20 px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors trapezoid-button"
                         style={{ borderBottom: 0 }}
                       >
                         <X size={14} />

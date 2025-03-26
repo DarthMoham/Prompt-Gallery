@@ -26,3 +26,11 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+@layer components {
+  .trapezoid-button {
+    @apply rounded-t-2xl; /* Increased rounding on the top corners */
+    position: relative;
+    clip-path: polygon(5% 0, 95% 0, 100% 100%, 0% 100%);
+  }
+}
