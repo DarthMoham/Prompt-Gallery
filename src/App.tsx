@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Sparkles, Filter, Wand2 } from 'lucide-react';
+import { Plus, Search, Sparkles, Filter, Wand2, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { PromptCard } from './components/PromptCard';
 import { AddPromptModal } from './components/AddPromptModal';
@@ -133,6 +133,14 @@ function App() {
     setIsModalOpen(true);
   };
 
+  const handleClearOriginal = () => {
+    setPromptToEnhance('');
+  };
+
+  const handleClearEnhanced = () => {
+    setEnhancedPrompt('');
+  };
+
   if (error) {
     return (
       <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
@@ -182,12 +190,24 @@ function App() {
               <div className="flex items-center justify-between">
                 <label className="text-white/80 text-sm font-medium">Original Prompt</label>
               </div>
-              <textarea
-                value={promptToEnhance}
-                onChange={(e) => setPromptToEnhance(e.target.value)}
-                placeholder="Enter your prompt here..."
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
-              />
+              <div className="relative">
+                {promptToEnhance && (
+                  <button
+                    onClick={handleClearOriginal}
+                    className="absolute -top-[33px] right-0 bg-white/10 hover:bg-white/20 text-white/60 hover:text-white border border-white/10 rounded-tl-lg rounded-tr-lg rounded-br-lg px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors"
+                    style={{ borderBottom: 0 }}
+                  >
+                    <X size={14} />
+                    Clear
+                  </button>
+                )}
+                <textarea
+                  value={promptToEnhance}
+                  onChange={(e) => setPromptToEnhance(e.target.value)}
+                  placeholder="Enter your prompt here..."
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
+                />
+              </div>
               <button
                 onClick={handleEnhancePrompt}
                 disabled={isEnhancing || !promptToEnhance.trim()}
@@ -204,11 +224,23 @@ function App() {
               </div>
               <div className={`relative ${!enhancedPrompt ? 'min-h-[180px]' : ''}`}>
                 {enhancedPrompt ? (
-                  <textarea
-                    value={enhancedPrompt}
-                    onChange={(e) => setEnhancedPrompt(e.target.value)}
-                    className="w-full bg-cyan-500/5 border border-cyan-500/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
-                  />
+                  <div className="relative">
+                    {enhancedPrompt && (
+                      <button
+                        onClick={handleClearEnhanced}
+                        className="absolute -top-[33px] right-0 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 hover:text-cyan-200 border border-cyan-500/20 rounded-tl-lg rounded-tr-lg rounded-br-lg px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors"
+                        style={{ borderBottom: 0 }}
+                      >
+                        <X size={14} />
+                        Clear
+                      </button>
+                    )}
+                    <textarea
+                      value={enhancedPrompt}
+                      onChange={(e) => setEnhancedPrompt(e.target.value)}
+                      className="w-full bg-cyan-500/5 border border-cyan-500/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 min-h-[180px] resize-none"
+                    />
+                  </div>
                 ) : (
                   <div className="absolute inset-0 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">
                     <div className="text-center px-6">
