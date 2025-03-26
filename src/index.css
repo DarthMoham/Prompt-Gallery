@@ -29,7 +29,7 @@ body {
 
 @layer components {
   .trapezoid-button {
-    @apply rounded-t-2xl; /* Increased rounding on the top corners */
+    @apply rounded-t-2xl;
     position: relative;
     clip-path: polygon(5% 0, 95% 0, 100% 100%, 0% 100%);
   }
