@@ -6,6 +6,13 @@ import { AddPromptModal } from './components/AddPromptModal';
 import * as api from './lib/api';
 import { Prompt } from './lib/api';
 
+// Declare gtag on the window object for TypeScript
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 function App() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +33,7 @@ function App() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const data = await api.fetchPrompts();
       setPrompts(data);
     } catch (err) {
@@ -49,6 +56,10 @@ function App() {
       const enhanced = await api.enhancePrompt(promptToEnhance);
       setEnhancedPrompt(enhanced);
       toast.success('Prompt enhanced successfully!');
+
+      // Track GA4 event for successful prompt enhancement
+      window.gtag('event', 'enhance_prompt_success');
+
     } catch (err) {
       toast.error('Failed to enhance prompt');
     } finally {
@@ -65,6 +76,12 @@ function App() {
       setPromptToEnhance('');
       setEnhancedPrompt('');
       setPrefilledContent('');
+
+      // Track GA4 event for successful prompt addition
+      window.gtag('event', 'add_prompt_success', {
+        category: promptData.category,
+      });
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to add prompt';
       toast.error(errorMessage);
@@ -76,6 +93,12 @@ function App() {
       await api.updatePrompt(id, promptData);
       toast.success('Prompt updated successfully');
       await fetchPrompts();
+
+      // Track GA4 event for successful prompt edit
+      window.gtag('event', 'edit_prompt_success', {
+        category: promptData.category,
+      });
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update prompt';
       toast.error(errorMessage);
@@ -87,6 +110,10 @@ function App() {
       await api.deletePrompt(id);
       toast.success('Prompt deleted successfully');
       await fetchPrompts();
+
+      // Track GA4 event for successful prompt deletion
+      window.gtag('event', 'delete_prompt_success');
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete prompt';
       toast.error(errorMessage);
@@ -96,26 +123,30 @@ function App() {
   const categories = ['all', ...new Set(prompts.map(prompt => prompt.category))].sort();
 
   const filteredPrompts = prompts.filter(prompt => {
-    const matchesSearch = 
+    const matchesSearch =
       prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.category.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = 
-      selectedCategory === 'all' || 
+
+    const matchesCategory =
+      selectedCategory === 'all' ||
       prompt.category.toLowerCase() === selectedCategory.toLowerCase();
-    
+
     return matchesSearch && matchesCategory;
   });
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
+    // Track GA4 event for category click (if needed, separate from filter change)
+    // window.gtag('event', 'category_chip_click', { category: category });
   };
 
   const handleCopyEnhanced = async () => {
     try {
       await navigator.clipboard.writeText(enhancedPrompt);
       toast.success('Enhanced prompt copied to clipboard!');
+      // Track GA4 event for copying enhanced prompt
+      window.gtag('event', 'copy_enhanced_prompt');
     } catch (err) {
       toast.error('Failed to copy to clipboard');
     }
@@ -124,14 +155,20 @@ function App() {
   const handleSaveEnhanced = () => {
     setPrefilledContent(enhancedPrompt);
     setIsModalOpen(true);
+    // Track GA4 event for initiating save of enhanced prompt
+    window.gtag('event', 'save_enhanced_prompt_initiated');
   };
 
   const handleClearOriginal = () => {
     setPromptToEnhance('');
+    // Track GA4 event for clearing original prompt
+    window.gtag('event', 'clear_original_prompt');
   };
 
   const handleClearEnhanced = () => {
     setEnhancedPrompt('');
+    // Track GA4 event for clearing enhanced prompt
+    window.gtag('event', 'clear_enhanced_prompt');
   };
 
   if (error) {
@@ -163,6 +200,8 @@ function App() {
             onClick={() => {
               setPrefilledContent('');
               setIsModalOpen(true);
+              // Track GA4 event for opening add prompt modal
+              window.gtag('event', 'open_add_prompt_modal');
             }}
             className="flex items-center gap-1 sm:gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base"
           >
@@ -269,7 +308,15 @@ function App() {
               type="text"
               placeholder="Search prompts..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                // Track GA4 event for search
+                if (e.target.value.trim()) {
+                  window.gtag('event', 'search_prompts', {
+                    search_term: e.target.value.trim(),
+                  });
+                }
+              }}
               className="w-full bg-white/[0.07] border border-white/[0.07] rounded-lg pl-10 pr-4 py-2 text-white placeholder-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.09] transition-colors"
             />
           </div>
@@ -278,12 +325,18 @@ function App() {
             <div className="relative inline-block w-full sm:w-[240px]">
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  // Track GA4 event for filtering category
+                  window.gtag('event', 'filter_category', {
+                    category: e.target.value,
+                  });
+                }}
                 className="appearance-none w-full bg-white/[0.07] border border-white/[0.07] rounded-lg pl-10 pr-8 py-2 text-white focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.09] cursor-pointer transition-colors"
               >
                 {categories.map(category => (
-                  <option 
-                    key={category} 
+                  <option
+                    key={category}
                     value={category}
                     className="bg-[#0F1729] text-white"
                   >
@@ -329,6 +382,8 @@ function App() {
           onClose={() => {
             setIsModalOpen(false);
             setPrefilledContent('');
+            // Track GA4 event for closing add prompt modal
+            window.gtag('event', 'close_add_prompt_modal');
           }}
           onAdd={addPrompt}
           prefilledContent={prefilledContent}
