@@ -40,6 +40,11 @@ function App() {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch prompts';
       setError(errorMessage);
       toast.error(errorMessage);
+      window.gtag('event', 'client_error', {
+        error_message: errorMessage,
+        component: 'App',
+        action: 'fetchPrompts'
+      });
     } finally {
       setIsLoading(false);
     }
@@ -69,6 +74,11 @@ function App() {
       toast.error('Failed to enhance prompt');
       // Track GA4 event for failed prompt enhancement
       window.gtag('event', 'enhance_prompt_failure');
+      window.gtag('event', 'client_error', {
+        error_message: err instanceof Error ? err.message : 'Failed to enhance prompt',
+        component: 'App',
+        action: 'handleEnhancePrompt'
+      });
     } finally {
       setIsEnhancing(false);
     }
@@ -92,6 +102,11 @@ function App() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to add prompt';
       toast.error(errorMessage);
+      window.gtag('event', 'client_error', {
+        error_message: errorMessage,
+        component: 'App',
+        action: 'addPrompt'
+      });
     }
   }
 
@@ -109,6 +124,11 @@ function App() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update prompt';
       toast.error(errorMessage);
+      window.gtag('event', 'client_error', {
+        error_message: errorMessage,
+        component: 'App',
+        action: 'editPrompt'
+      });
     }
   }
 
@@ -124,6 +144,11 @@ function App() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete prompt';
       toast.error(errorMessage);
+      window.gtag('event', 'client_error', {
+        error_message: errorMessage,
+        component: 'App',
+        action: 'deletePrompt'
+      });
     }
   }
 
@@ -342,13 +367,13 @@ function App() {
                 className="appearance-none w-full bg-white/[0.07] border border-white/[0.07] rounded-lg pl-10 pr-8 py-2 text-white focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.09] cursor-pointer transition-colors"
               >
                 {categories.map(category => (
-                  <option
+                  <PromptCard
                     key={category}
-                    value={category}
-                    className="bg-[#0F1729] text-white"
-                  >
-                    {category === 'all' ? 'All Categories' : category}
-                  </option>
+                    prompt={prompt}
+                    onDelete={deletePrompt}
+                    onEdit={editPrompt}
+                    onCategoryClick={handleCategoryClick}
+                  />
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">

@@ -22,6 +22,10 @@ export interface Prompt {
       return await response.json();
     } catch (error) {
       console.error('Error fetching prompts:', error);
+      window.gtag('event', 'client_error', {
+        error_message: error instanceof Error ? error.message : 'Failed to fetch prompts',
+        api_endpoint: '/api/prompts'
+      });
       throw error;
     }
   }
@@ -38,6 +42,10 @@ export interface Prompt {
       return await response.json();
     } catch (error) {
       console.error('Error fetching categories:', error);
+      window.gtag('event', 'client_error', {
+        error_message: error instanceof Error ? error.message : 'Failed to fetch categories',
+        api_endpoint: '/api/categories'
+      });
       throw error;
     }
   }
@@ -60,6 +68,10 @@ export interface Prompt {
       }
     } catch (error) {
       console.error('Error adding prompt:', error);
+      window.gtag('event', 'client_error', {
+        error_message: error instanceof Error ? error.message : 'Failed to add prompt',
+        api_endpoint: '/api/prompts (POST)'
+      });
       throw error;
     }
   }
@@ -82,6 +94,10 @@ export interface Prompt {
       }
     } catch (error) {
       console.error('Error updating prompt:', error);
+      window.gtag('event', 'client_error', {
+        error_message: error instanceof Error ? error.message : 'Failed to update prompt',
+        api_endpoint: '/api/prompts/:id (PUT)'
+      });
       throw error;
     }
   }
@@ -100,6 +116,10 @@ export interface Prompt {
       }
     } catch (error) {
       console.error('Error deleting prompt:', error);
+      window.gtag('event', 'client_error', {
+        error_message: error instanceof Error ? error.message : 'Failed to delete prompt',
+        api_endpoint: '/api/prompts/:id (DELETE)'
+      });
       throw error;
     }
   }
@@ -125,6 +145,10 @@ export interface Prompt {
       return data.enhancedPrompt;
     } catch (error) {
       console.error("Error enhancing prompt:", error);
+      window.gtag('event', 'client_error', {
+        error_message: error instanceof Error ? error.message : 'Failed to enhance prompt',
+        api_endpoint: '/api/enhance-prompt'
+      });
       throw new Error("Failed to enhance prompt");
     }
   }
