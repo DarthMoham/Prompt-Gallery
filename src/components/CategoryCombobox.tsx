@@ -43,6 +43,8 @@ export function CategoryCombobox({ value, onChange, categories, placeholder = "C
     onChange(category);
     setSearchTerm(category);
     setIsOpen(false);
+    // Track GA4 event for selecting an existing category
+    window.gtag('event', 'select_existing_category', { category: category });
   };
 
   return (
@@ -91,7 +93,11 @@ export function CategoryCombobox({ value, onChange, categories, placeholder = "C
             ) : searchTerm.trim() !== '' ? (
               <button
                 type="button"
-                onClick={() => handleCategorySelect(searchTerm)}
+                onClick={() => {
+                  handleCategorySelect(searchTerm);
+                  // Track GA4 event for creating a new category
+                  window.gtag('event', 'create_new_category', { category: searchTerm });
+                }}
                 className="w-full text-left px-4 py-2.5 text-white hover:bg-white/10 transition-colors flex items-center gap-2"
               >
                 <Plus size={16} className="text-cyan-400" />

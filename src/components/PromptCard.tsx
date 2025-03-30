@@ -5,6 +5,13 @@ import { EditPromptModal } from './EditPromptModal';
 import { ViewPromptModal } from './ViewPromptModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
+// Declare gtag on the window object for TypeScript
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 interface PromptCardProps {
   prompt: {
     id: string;
@@ -31,6 +38,10 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
       setIsCopied(true);
       toast.success('Copied to clipboard!');
       setTimeout(() => setIsCopied(false), 2000);
+      // Track GA4 event for copying prompt from card
+      window.gtag('event', 'copy_prompt_card', {
+        category: prompt.category,
+      });
     } catch (err) {
       toast.error('Failed to copy to clipboard');
     }
@@ -43,11 +54,19 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditModalOpen(true);
+    // Track GA4 event for opening edit modal from card
+    window.gtag('event', 'open_edit_modal_card', {
+      category: prompt.category,
+    });
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDeleteModalOpen(true);
+    // Track GA4 event for opening delete modal from card
+    window.gtag('event', 'open_delete_modal_card', {
+      category: prompt.category,
+    });
   };
 
   const handleConfirmDelete = () => {
@@ -56,18 +75,31 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
     if (isViewModalOpen) {
       setIsViewModalOpen(false);
     }
+    // Note: The actual delete success event is tracked in App.tsx where the API call happens
   };
 
   const handleCategoryClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onCategoryClick(prompt.category);
+    // Track GA4 event for category chip click
+    window.gtag('event', 'category_chip_click', {
+      category: prompt.category,
+    });
+  };
+
+  const handleOpenViewModal = () => {
+    setIsViewModalOpen(true);
+    // Track GA4 event for opening view modal from card
+    window.gtag('event', 'open_view_modal_card', {
+      category: prompt.category,
+    });
   };
 
   return (
     <>
-      <div 
+      <div
         className="group bg-white/[0.07] hover:bg-white/[0.09] backdrop-blur-lg rounded-xl p-6 transition-all duration-300 border border-white/[0.07] hover:border-blue-500/30 cursor-pointer relative overflow-hidden"
-        onClick={() => setIsViewModalOpen(true)}
+        onClick={handleOpenViewModal}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-sky-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="relative">
@@ -82,21 +114,21 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
               </button>
             </div>
             <div className="flex gap-2">
-              <button 
+              <button
                 onClick={handleCopy}
                 className="text-white/60 hover:text-white transition-colors"
                 title="Copy to clipboard"
               >
                 {isCopied ? <Check size={20} className="text-green-400" /> : <Copy size={20} />}
               </button>
-              <button 
+              <button
                 onClick={handleEditClick}
                 className="text-white/60 hover:text-white transition-colors"
                 title="Edit prompt"
               >
                 <Pencil size={20} />
               </button>
-              <button 
+              <button
                 onClick={handleDeleteClick}
                 className="text-white/60 hover:text-red-400 transition-colors"
                 title="Delete prompt"
@@ -114,27 +146,43 @@ export function PromptCard({ prompt, onDelete, onEdit, onCategoryClick }: Prompt
 
       <EditPromptModal
         isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          // Track GA4 event for closing edit modal
+          window.gtag('event', 'close_edit_modal', { category: prompt.category });
+        }}
         onEdit={handleEdit}
         prompt={prompt}
       />
 
       <ViewPromptModal
         isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          // Track GA4 event for closing view modal
+          window.gtag('event', 'close_view_modal', { category: prompt.category });
+        }}
         onEdit={() => {
           setIsViewModalOpen(false);
           setIsEditModalOpen(true);
+          // Track GA4 event for clicking edit from view modal
+          window.gtag('event', 'edit_from_view_modal', { category: prompt.category });
         }}
         onDelete={() => {
           setIsDeleteModalOpen(true);
+          // Track GA4 event for clicking delete from view modal
+          window.gtag('event', 'delete_from_view_modal', { category: prompt.category });
         }}
         prompt={prompt}
       />
 
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          // Track GA4 event for closing delete confirmation modal
+          window.gtag('event', 'close_delete_modal', { category: prompt.category });
+        }}
         onConfirm={handleConfirmDelete}
         promptTitle={prompt.title}
       />

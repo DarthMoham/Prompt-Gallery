@@ -51,6 +51,11 @@ function App() {
       return;
     }
 
+    // Track GA4 event for requesting prompt enhancement
+    window.gtag('event', 'enhance_prompt_requested', {
+      original_prompt_length: promptToEnhance.length,
+    });
+
     try {
       setIsEnhancing(true);
       const enhanced = await api.enhancePrompt(promptToEnhance);
@@ -62,6 +67,8 @@ function App() {
 
     } catch (err) {
       toast.error('Failed to enhance prompt');
+      // Track GA4 event for failed prompt enhancement
+      window.gtag('event', 'enhance_prompt_failure');
     } finally {
       setIsEnhancing(false);
     }

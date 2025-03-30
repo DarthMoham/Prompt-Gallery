@@ -60,7 +60,11 @@ export function DeleteConfirmationModal({ isOpen, onClose, onConfirm, promptTitl
               Cancel
             </button>
             <button
-              onClick={onConfirm}
+              onClick={() => {
+                onConfirm();
+                // Track GA4 event for confirming deletion
+                window.gtag('event', 'confirm_delete_prompt');
+              }}
               className="flex-1 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 rounded-lg transition-colors"
             >
               Delete

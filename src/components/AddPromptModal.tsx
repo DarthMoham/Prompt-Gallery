@@ -53,6 +53,11 @@ export function AddPromptModal({ isOpen, onClose, onAdd, prefilledContent = '' }
       return;
     }
 
+    // Track GA4 event for requesting prompt enhancement within the Add modal
+    window.gtag('event', 'enhance_prompt_requested_add_modal', {
+      original_prompt_length: content.length,
+    });
+
     try {
       setIsEnhancing(true);
       const enhanced = await enhancePrompt(content);
@@ -61,8 +66,12 @@ export function AddPromptModal({ isOpen, onClose, onAdd, prefilledContent = '' }
       toast.success('Prompt enhanced! Choose which version you prefer or edit either one.', {
         duration: 5000,
       });
+      // Track GA4 event for successful prompt enhancement within the modal
+      window.gtag('event', 'enhance_prompt_success_add_modal');
     } catch (error) {
       toast.error('Failed to enhance prompt');
+      // Track GA4 event for failed prompt enhancement within the modal
+      window.gtag('event', 'enhance_prompt_failure_add_modal');
     } finally {
       setIsEnhancing(false);
     }
@@ -73,12 +82,16 @@ export function AddPromptModal({ isOpen, onClose, onAdd, prefilledContent = '' }
     setEnhancedContent('');
     setShowComparison(false);
     toast.success('Enhanced version accepted!');
+    // Track GA4 event for accepting the enhanced prompt
+    window.gtag('event', 'accept_enhanced_prompt_add_modal');
   };
 
   const handleKeepOriginal = () => {
     setEnhancedContent('');
     setShowComparison(false);
     toast.success('Keeping original version');
+    // Track GA4 event for keeping the original prompt
+    window.gtag('event', 'keep_original_prompt_add_modal');
   };
 
   if (!isOpen) return null;
@@ -97,7 +110,14 @@ export function AddPromptModal({ isOpen, onClose, onAdd, prefilledContent = '' }
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    if (!isValid) {
+      // Track GA4 event for form validation failure
+      window.gtag('event', 'add_prompt_validation_failure', {
+        failed_fields: Object.keys(newErrors).join(','),
+      });
+    }
+    return isValid;
   };
 
   const handleSubmit = (e: React.FormEvent) => {

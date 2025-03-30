@@ -30,6 +30,10 @@ export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: V
       setIsCopied(true);
       toast.success('Copied to clipboard!');
       setTimeout(() => setIsCopied(false), 2000);
+      // Track GA4 event for copying prompt from view modal
+      window.gtag('event', 'copy_prompt_view_modal', {
+        category: prompt.category,
+      });
     } catch (err) {
       toast.error('Failed to copy to clipboard');
     }
@@ -78,14 +82,22 @@ export function ViewPromptModal({ isOpen, onClose, onEdit, onDelete, prompt }: V
               {isCopied ? <Check size={20} className="text-green-400" /> : <Copy size={20} />}
             </button>
             <button 
-              onClick={onEdit}
+              onClick={() => {
+                onEdit();
+                // Track GA4 event for clicking edit button within view modal
+                window.gtag('event', 'click_edit_view_modal', { category: prompt.category });
+              }}
               className="text-white/60 hover:text-white transition-colors"
               title="Edit prompt"
             >
               <Pencil size={20} />
             </button>
             <button 
-              onClick={handleDeleteClick}
+              onClick={() => {
+                handleDeleteClick();
+                // Track GA4 event for clicking delete button within view modal
+                window.gtag('event', 'click_delete_view_modal', { category: prompt.category });
+              }}
               className="text-white/60 hover:text-red-400 transition-colors"
               title="Delete prompt"
             >

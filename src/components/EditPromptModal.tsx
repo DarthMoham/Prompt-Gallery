@@ -49,6 +49,12 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
       return;
     }
 
+    // Track GA4 event for requesting prompt enhancement within the edit modal
+    window.gtag('event', 'enhance_prompt_requested_edit_modal', {
+      original_prompt_length: content.length,
+      category: prompt.category, // Add category context
+    });
+
     try {
       setIsEnhancing(true);
       const enhanced = await enhancePrompt(content);
@@ -57,8 +63,12 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
       toast.success('Prompt enhanced! Choose which version you prefer or edit either one.', {
         duration: 5000,
       });
+      // Track GA4 event for successful prompt enhancement within the edit modal
+      window.gtag('event', 'enhance_prompt_success_edit_modal', { category: prompt.category });
     } catch (error) {
       toast.error('Failed to enhance prompt');
+      // Track GA4 event for failed prompt enhancement within the edit modal
+      window.gtag('event', 'enhance_prompt_failure_edit_modal', { category: prompt.category });
     } finally {
       setIsEnhancing(false);
     }
@@ -69,12 +79,16 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
     setEnhancedContent('');
     setShowComparison(false);
     toast.success('Enhanced version accepted!');
+    // Track GA4 event for accepting the enhanced prompt in edit modal
+    window.gtag('event', 'accept_enhanced_prompt_edit_modal', { category: prompt.category });
   };
 
   const handleKeepOriginal = () => {
     setEnhancedContent('');
     setShowComparison(false);
     toast.success('Keeping original version');
+    // Track GA4 event for keeping the original prompt in edit modal
+    window.gtag('event', 'keep_original_prompt_edit_modal', { category: prompt.category });
   };
 
   if (!isOpen) return null;
@@ -93,7 +107,15 @@ export function EditPromptModal({ isOpen, onClose, onEdit, prompt }: EditPromptM
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    if (!isValid) {
+      // Track GA4 event for form validation failure in edit modal
+      window.gtag('event', 'edit_prompt_validation_failure', {
+        failed_fields: Object.keys(newErrors).join(','),
+        category: prompt.category,
+      });
+    }
+    return isValid;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
