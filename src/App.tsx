@@ -367,13 +367,9 @@ function App() {
                 className="appearance-none w-full bg-white/[0.07] border border-white/[0.07] rounded-lg pl-10 pr-8 py-2 text-white focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.09] cursor-pointer transition-colors"
               >
                 {categories.map(category => (
-                  <PromptCard
-                    key={category}
-                    prompt={prompt}
-                    onDelete={deletePrompt}
-                    onEdit={editPrompt}
-                    onCategoryClick={handleCategoryClick}
-                  />
+                  <option key={category} value={category}>
+                    {category === 'all' ? 'All Categories' : category}
+                  </option>
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
