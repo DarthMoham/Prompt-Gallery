@@ -45,7 +45,7 @@ function toInitialCaps(str) {
 app.post('/api/enhance-prompt', async (req, res) => {
   try {
     const { prompt } = req.body;
-    
+
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
@@ -58,7 +58,7 @@ app.post('/api/enhance-prompt', async (req, res) => {
       prompt;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-3.1-flash-lite",
       systemInstruction: systemPrompt,
     });
 
@@ -132,7 +132,7 @@ app.get('/api/categories', async (req, res) => {
 app.post('/api/prompts', async (req, res) => {
   try {
     const promptData = req.body;
-    
+
     if (!promptData.title || !promptData.content || !promptData.category) {
       return res.status(400).json({ error: 'Title, content, and category are required' });
     }
@@ -161,7 +161,7 @@ app.put('/api/prompts/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const promptData = req.body;
-    
+
     if (!promptData.title || !promptData.content || !promptData.category) {
       return res.status(400).json({ error: 'Title, content, and category are required' });
     }
@@ -190,7 +190,7 @@ app.put('/api/prompts/:id', async (req, res) => {
 app.delete('/api/prompts/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const { error } = await supabase
       .from('prompts')
       .delete()
@@ -212,7 +212,7 @@ app.delete('/api/prompts/:id', async (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   // Serve the static files from the dist directory
   app.use(express.static(join(__dirname, 'dist')));
-  
+
   // Handle all other routes by returning the index.html
   app.get('*', (req, res) => {
     // Exclude API routes from the catch-all handler
